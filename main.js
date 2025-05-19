@@ -20,7 +20,7 @@ const serial = async (valoresSensorAnalogico) => {
         host: 'localhost',
         user: 'dataquino',
         password: 'Sptech#2024',
-        database: 'airguard',
+        database: 'air_guard',
         port: 3307
     }).promise();
 
@@ -54,30 +54,13 @@ const serial = async (valoresSensorAnalogico) => {
         // insere os dados no banco de dados (se habilitado)
         if (HABILITAR_OPERACAO_INSERIR) {
             await poolBancoDados.execute(
-                'INSERT INTO airguard.leituraSensor (concentracao_gas, fkSensor) VALUES (?, 1)',
+                'INSERT INTO air_guard.leitura (concentracao_gas, fkSensor) VALUES (?, 1)',
                 [sensorAnalogico]
             );
             if (sensorAnalogico > 20) {
                 await poolBancoDados.execute(
-                    `INSERT INTO airguard.alerta (concentracao_gas, data_hora, fkleituraSensor, nivel_alerta, mensagem_alerta)
-    SELECT ls.concentracao_gas, ls.data_hora, ls.id,
-        CASE
-            WHEN ls.concentracao_gas < 25 THEN 'baixo'
-            WHEN ls.concentracao_gas < 30 THEN 'médio'
-            WHEN ls.concentracao_gas < 39 THEN 'alto'
-            ELSE 'crítico'
-        END AS nivel_alerta,
-        CASE
-            WHEN ls.concentracao_gas < 25 THEN 'Cuidado o nivel de gás está chegando no limite estipulado'
-            WHEN ls.concentracao_gas < 30 THEN 'Cuidado o nivel de gás está consideravelmente alto'
-            WHEN ls.concentracao_gas < 39 THEN 'Cuidado o nivel de gás está no limite'
-            ELSE 'O nivel de gás ultrapassou o limite'
-        END AS mensagem_alerta
-    FROM airguard.leituraSensor ls
-    LEFT JOIN alerta a on ls.id = a.fkleituraSensor
-    WHERE ls.concentracao_gas > 20
-    AND a.fkleituraSensor IS NULL;
-`
+                    `INSERT INTO alerta (mensagem, nivel_alerta, fkleitura)
+                    SELECT * FROM vw_alerta`
                 );
                 console.log("Alerta emitido");
             }
