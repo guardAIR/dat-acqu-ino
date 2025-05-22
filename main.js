@@ -53,13 +53,14 @@ const serial = async (valoresSensorAnalogico) => {
 
         // insere os dados no banco de dados (se habilitado)
         if (HABILITAR_OPERACAO_INSERIR) {
+            var fkSensor = Math.floor(Math.random() * 4 + 1).toFixed(0);
             await poolBancoDados.execute(
-                'INSERT INTO air_guard.leitura (concentracao_gas, fkSensor) VALUES (?, 1)',
+                `INSERT INTO air_guard.leitura (concentracao_gas, fkSensor) VALUES (?, ${fkSensor})`,
                 [sensorAnalogico]
             );
             if (sensorAnalogico > 20) {
                 await poolBancoDados.execute(
-                    `INSERT INTO alerta (mensagem, nivel_alerta, fkleitura)
+                    `INSERT INTO air_guard.alerta (mensagem, nivel_alerta, fkleitura)
                     SELECT * FROM vw_alerta`
                 );
                 console.log("Alerta emitido");
