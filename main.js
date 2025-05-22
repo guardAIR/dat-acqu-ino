@@ -53,7 +53,7 @@ const serial = async (valoresSensorAnalogico) => {
 
         // insere os dados no banco de dados (se habilitado)
         if (HABILITAR_OPERACAO_INSERIR) {
-            var fkSensor = Math.floor(Math.random() * 4 + 1).toFixed(0);
+            var fkSensor = Math.floor(Math.random() * 14 + 1).toFixed(0);
             await poolBancoDados.execute(
                 `INSERT INTO air_guard.leitura (concentracao_gas, fkSensor) VALUES (?, ${fkSensor})`,
                 [sensorAnalogico]
